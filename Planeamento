@@ -1,0 +1,41 @@
+Planeamento do "First assignment"
+
+1. Medir os tempos de execução do algoritmo a) em C e em Java e exportar os resultados para ficheiro csv com incrementos de 400 nas dimensões de matrix de input
+t -> resultado de execução
+C       Java
+600  t   600  t
+1000 t   1000 t
+1400 t   1400 t
+1800 t   1800 t
+2200 t   2200 t
+2600 t   2600 t
+3000 t   3000 t
+
+2. Medir os tempos de execução do algoritmo b) em C e em Java e exportar os resultados para ficheiro csv com incrementos de 400 nas dimensões de matrix de input
+   Medir os tempos de execução do algoritmo b) em C e em Java e exportar os resultados para ficheiro csv com incrementos de 2000 nas dimensões de matrix de input
+t -> resultado de execução
+C       Java
+600  t   600  t
+1000 t   1000 t
+1400 t   1400 t
+1800 t   1800 t
+2200 t   2200 t
+2600 t   2600 t
+3000 t   3000 t
+
+C       Java
+4000  t   4000  t
+6000 t    6000 t
+8000 t    8000 t
+10000 t   10000 t
+
+3. Medir os tempos de execução do algoritmo a) e b) em C utilizando OMP com nr variável de threads (versão paralela) e exportar os resultados para ficheiro csv com incrementos de 400 nas dimensões de matrix de input
+t -> resultado de execução
+1thread  2thread 3thread   4thread
+600  t   600  t   600   t  600   t
+1000 t   1000 t   1000  t  1000  t
+1400 t   1400 t   1400  t  1400  t
+1800 t   1800 t   1800  t  1800  t
+2200 t   2200 t   2200  t  2200  t
+2600 t   2600 t   2600  t  2600  t
+3000 t   3000 t   3000  t  3000  t
