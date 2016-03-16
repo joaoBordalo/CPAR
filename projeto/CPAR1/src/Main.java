@@ -51,19 +51,16 @@ public class Main {
 		for(int i=0; i<lin; i++)
 			for(int j=0; j<col; j++)
 				phb[i][j] = (double)(i+1);
-		
 
-		double temp;
 		for(int i=0; i<lin; i++)
 		{	
 			for( int k=0; k<lin; k++)
 			{	 
-				temp  = 0;
 				for( int j=0; j<col; j++)
 				{	
-					temp += pha[i][k] * phb[k][j];
+					phc[i][k] += pha[i][k] * phb[j][k];
 				}
-				phc[i][k]=temp;
+
 			}
 		}
 		return phc;
@@ -88,16 +85,21 @@ public class Main {
 
 		double temp;
 		for(int i=0; i<lin; i++)
-		{	for( int j=0; j<col; j++)
-		{	 temp  = 0;
-		for( int k=0; k<lin; k++)
 		{	
-			temp += pha[i][k] * phb[k][j];
-		}
-		phc[i][j]=temp;
-		}
+			for( int j=0; j<col; j++)
+			{	 
+				temp  = 0;
+				for( int k=0; k<lin; k++)
+				{	
+					temp += pha[i][k] * phb[k][j];
+				}
+				phc[i][j]=temp;
+			}
 		}
 		return phc;
 	}
 
 }
+
+
+
