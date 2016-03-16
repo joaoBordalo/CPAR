@@ -1,4 +1,4 @@
-//#include <omp.h>
+#include <omp.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
@@ -11,10 +11,10 @@ using namespace std;
 #define SYSTEMTIME clock_t
 
  
-void OnMult(int m_ar, int m_br) 
+double OnMult(int m_ar, int m_br) 
 {
 	
-	SYSTEMTIME Time1, Time2;
+	double Time1, Time2;
 	
 	char st[100];
 	double temp;
@@ -40,7 +40,7 @@ void OnMult(int m_ar, int m_br)
 
 
 
-    Time1 = clock();
+    Time1 = omp_get_wtime();
 
 	for(i=0; i<m_ar; i++)
 	{	for( j=0; j<m_br; j++)
@@ -54,28 +54,28 @@ void OnMult(int m_ar, int m_br)
 	}
 
 
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+    Time2 = omp_get_wtime();
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
 	cout << st;
 
-	cout << "Result matrix: " << endl;
+	/*cout << "Result matrix: " << endl;
 	for(i=0; i<1; i++)
 	{	for(j=0; j<min(10,m_br); j++)
 			cout << phc[j] << " ";
 	}
-	cout << endl;
+	cout << endl;*/
 
     free(pha);
     free(phb);
     free(phc);
-	
+	return (double)(Time2 - Time1);
 	
 }
 
 
-void OnMultLine(int m_ar, int m_br)
+double OnMultLine(int m_ar, int m_br)
 {
-    SYSTEMTIME Time1, Time2;
+    double Time1, Time2;
 	
 	char st[100];
 	double temp;
@@ -105,34 +105,35 @@ void OnMultLine(int m_ar, int m_br)
 
 
 
-    Time1 = clock();
+    Time1 = omp_get_wtime();
 
 	for(i=0; i<m_ar; i++)
 	{	for( k=0; k<m_ar; k++)
 		{	
 			for( j=0; j<m_br; j++)
 			{	
-				phc[i*m_ar+k] += pha[i*m_ar+k] * phb[j*m_br+k]; 
+				phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j]; 
 			}
 			
 		}
 	}
 
 
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+    Time2 = omp_get_wtime();
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
 	cout << st;
 
-	cout << "Result matrix: " << endl;
+	/*cout << "Result matrix: " << endl;
 	for(i=0; i<min(10,m_ar); i++)
 	{	for(j=0; j<min(10,m_br); j++)
 			cout << phc[j] << " ";
 	}
-	cout << endl;
+	cout << endl;*/
 
     free(pha);
     free(phb);
     free(phc);
+	return (double)(Time2 - Time1);
     
 }
 
@@ -168,6 +169,10 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
+void outputMatrixToFile(double resul, int i)
+{
+	cout << i << " : "<< resul << endl;
+}
 
 int main (int argc, char *argv[])
 {
@@ -196,9 +201,16 @@ int main (int argc, char *argv[])
 
 	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
 	if (ret != PAPI_OK) cout << "ERRO: PAPI_L2_DCM" << endl;
+	int i;
+	for(i=600;i <= 3000; i=i+400)
+	{
+		outputMatrixToFile(OnMult(i, i),i);
+		outputMatrixToFile(OnMultLine(i, i),i);
+	}
+		
 
-
-	op=1;
+		
+	/*op=1;
 	do {
 		cout << endl << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
@@ -209,10 +221,10 @@ int main (int argc, char *argv[])
 		printf("Dimensions: lins cols ? ");
    		cin >> lin >> col;
 
-
+*/
 
 		// Start counting
-		ret = PAPI_start(EventSet);
+		/*ret = PAPI_start(EventSet);
 		if (ret != PAPI_OK) cout << "ERRO: Start PAPI" << endl;
 
 		switch (op){
@@ -237,7 +249,7 @@ int main (int argc, char *argv[])
 
 
 	}while (op != 0);
-
+*/
 		ret = PAPI_remove_event( EventSet, PAPI_L1_DCM );
 		if ( ret != PAPI_OK )
 			std::cout << "FAIL remove event" << endl; 
