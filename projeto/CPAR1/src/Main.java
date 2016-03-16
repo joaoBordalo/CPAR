@@ -19,10 +19,12 @@ public class Main {
 
 			switch (op){
 			case 1: 
-				printMatrix(onMult(lin, col));
+				double[][] m1 = onMult(lin, col);
+				//printMatrix(m1);
 				break;
 			case 2:
-				printMatrix(onMultlin(lin, col));
+				double[][] m2 = onMultlin(lin, col);
+				//printMatrix(m2);
 				break;
 			}
 		}while (op != 0);
@@ -52,17 +54,22 @@ public class Main {
 			for(int j=0; j<col; j++)
 				phb[i][j] = (double)(i+1);
 
+		long startTime = System.nanoTime();;
 		for(int i=0; i<lin; i++)
 		{	
 			for( int k=0; k<lin; k++)
 			{	 
 				for( int j=0; j<col; j++)
 				{	
-					phc[i][k] += pha[i][k] * phb[j][k];
+					phc[i][j] += pha[i][k] * phb[k][j];
 				}
 
 			}
 		}
+		
+		long totalTime = System.nanoTime() - startTime;
+		System.out.println("Total time = " + totalTime);
+		System.out.println();
 		return phc;
 
 	}
@@ -84,6 +91,7 @@ public class Main {
 				phb[i][j] = (double)(i+1);
 
 		double temp;
+		long startTime = System.nanoTime();
 		for(int i=0; i<lin; i++)
 		{	
 			for( int j=0; j<col; j++)
@@ -96,6 +104,11 @@ public class Main {
 				phc[i][j]=temp;
 			}
 		}
+		
+		long totalTime = System.nanoTime() - startTime;
+		System.out.println("Total time = " + totalTime);
+		System.out.println();
+		
 		return phc;
 	}
 
