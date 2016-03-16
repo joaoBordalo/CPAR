@@ -19,3 +19,7 @@ Setup PAPI
 - Compile matrixProd.cpp
   - g++ "yourFile.cpp" -lpapi
   - run ./a.out and introduce the matrix size values
+
+  Developers
+  João Bordalo
+  João Soares
