@@ -5,6 +5,7 @@
 #include <time.h>
 #include <cstdlib>
 #include <papi.h>
+#include <fstream>
 
 using namespace std;
 
@@ -55,8 +56,8 @@ double OnMult(int m_ar, int m_br)
 
 
     Time2 = omp_get_wtime();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
-	cout << st;
+	//sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
+	//cout << st;
 
 	/*cout << "Result matrix: " << endl;
 	for(i=0; i<1; i++)
@@ -120,8 +121,8 @@ double OnMultLine(int m_ar, int m_br)
 
 
     Time2 = omp_get_wtime();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
-	cout << st;
+	//sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
+	//cout << st;
 
 	/*cout << "Result matrix: " << endl;
 	for(i=0; i<min(10,m_ar); i++)
@@ -136,6 +137,25 @@ double OnMultLine(int m_ar, int m_br)
 	return (double)(Time2 - Time1);
     
 }
+
+void OutputToFile(int lin, int col, int inc, int limit/*, char* filename*/)
+{
+	int i;
+	double temp;
+	ofstream myfile;
+    myfile.open (/*filename*/"matrixMultResult.csv");
+    myfile << "i,Algoritmo a,Algoritmo b\n";
+	for(i=lin;i <= limit; i=i+inc)
+	{
+		temp=OnMult(i,i);
+		myfile << i << "," << temp << ",";
+		temp=OnMultLine(i,i);
+		myfile << temp << "\n";
+	}
+	myfile.close();
+}
+
+
 
 
 float produtoInterno(float *v1, float *v2, int col)
@@ -169,18 +189,14 @@ void init_papi() {
             << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
-void outputMatrixToFile(double resul, int i)
-{
-	cout << i << " : "<< resul << endl;
-}
 
 int main (int argc, char *argv[])
 {
 
 	char c;
-	int lin, col, nt=1;
+	int lin, col, nt=1, inc, limit;
 	int op;
-	
+	char* filename;
 	int EventSet = PAPI_NULL;
   	long long values[2];
   	int ret;
@@ -201,30 +217,34 @@ int main (int argc, char *argv[])
 
 	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
 	if (ret != PAPI_OK) cout << "ERRO: PAPI_L2_DCM" << endl;
-	int i;
-	for(i=600;i <= 3000; i=i+400)
-	{
-		outputMatrixToFile(OnMult(i, i),i);
-		outputMatrixToFile(OnMultLine(i, i),i);
-	}
-		
-
-		
-	/*op=1;
+	
+	op=1;
 	do {
-		cout << endl << "1. Multiplication" << endl;
+		cout << endl;
+		cout << "1. Multiplication" << endl;
 		cout << "2. Line Multiplication" << endl;
+		cout << "3. outputToFile" << endl;
 		cout << "Selection?: ";
+		
 		cin >>op;
 		if (op == 0)
 			break;
+			
 		printf("Dimensions: lins cols ? ");
    		cin >> lin >> col;
-
-*/
+   		
+		if(op == 3)
+		{
+			printf("Dimensional increment: inc ? ");
+			cin >> inc;
+			printf("Limit: limit ? ");
+			cin >> limit;
+			/*printf("outputFile: filename.csv (must be an existing file) ? ");
+			cin >> filename;*/
+		}
 
 		// Start counting
-		/*ret = PAPI_start(EventSet);
+		ret = PAPI_start(EventSet);
 		if (ret != PAPI_OK) cout << "ERRO: Start PAPI" << endl;
 
 		switch (op){
@@ -233,7 +253,9 @@ int main (int argc, char *argv[])
 				break;
 			case 2:
 				OnMultLine(lin, col);
-    
+				break;
+			case 3:
+				OutputToFile(lin, col, inc, limit/*, filename*/);
 				break;
 		}
 
@@ -249,7 +271,7 @@ int main (int argc, char *argv[])
 
 
 	}while (op != 0);
-*/
+
 		ret = PAPI_remove_event( EventSet, PAPI_L1_DCM );
 		if ( ret != PAPI_OK )
 			std::cout << "FAIL remove event" << endl; 
