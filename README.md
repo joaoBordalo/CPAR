@@ -17,8 +17,8 @@ Setup PAPI
   - sudo apt-get install papi-tools
 
 - Compile matrixProd.cpp
-  - g++ "yourFile.cpp" -lpapi
-  - run ./a.out and introduce the matrix size values
+  - g++ -o nomeDoExecutável -fopenmp "source.cpp" -lpapi 
+  - run ./nomeDoExecutével.out and introduce the matrix size values
 
   Developers
   João Bordalo
