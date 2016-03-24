@@ -57,7 +57,7 @@ public class Main {
 				temp = onMultlin(i, i);
 				writer.append(",");
 				writer.append(String.valueOf(temp));
-				writer.append('\n');
+				writer.append(";");
 			}
 		    writer.flush();
 		    writer.close();
