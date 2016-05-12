@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 //list[0] == true =>   2 => unmarked (prime)
@@ -9,7 +10,7 @@ using namespace std;
 
 vector <bool> markEven(vector <bool> primes)
 {
-	for (int i = 0; i < primes.size(); i>>2)
+	for (unsigned int i = 2; i < primes.size(); i = i + 2)
 	{
 		primes[i] = false;
 	}
@@ -20,13 +21,14 @@ vector <bool> sequencialPrime(vector <bool> primes)
 {
 	primes = markEven(primes);
 
-	for (int i = 1; i*i <= primes.size(); i++)
+	for (unsigned int i = 1; (unsigned int)pow(i + 2, 2) <= primes.size(); i++)
 	{
 		if (primes[i] != false)
 		{
-			for (int j = i*i; j < primes.size(); j=j+i)
+			unsigned int value = (unsigned int)pow(i + 2, 2);//(i+2) ^ 2
+			for (unsigned int j = value - 2; j < primes.size(); j = j + i + 2)
 			{
-				primes[(i + 2)*j] = false;
+				primes[j] = false;
 			}
 		}
 
@@ -48,25 +50,25 @@ vector <bool> initListPrime(int maxNumber)
 
 int main(int args, char* argsv[])
 {
-	
+
 	//int n = atoi(argsv[1]);
 	int n;
 	int op = 1;
 
-	do {
-		cout << endl;
-		cout << "1. Sequencial" << endl;
-		cout << "2. Parallel shared memory" << endl;
-		cout << "3. Parallel distributed memory" << endl;
-		cout << "Selection?: ";
+	//do {
+	cout << endl;
+	cout << "1. Sequencial" << endl;
+	cout << "2. Parallel shared memory" << endl;
+	cout << "3. Parallel distributed memory" << endl;
+	cout << "Selection?: ";
 
-		cin >> op;
-		if (op == 0)
-			break;
+	cin >> op;
+	//if (op == 0)
+	//break;
 
-		printf("Max Number: ");
-		cin >> n;
-	} while (op != 0);
+	printf("Max Number: ");
+	cin >> n;
+	//} while (op != 0);
 
 	vector <bool> list = initListPrime(n);
 
@@ -83,11 +85,11 @@ int main(int args, char* argsv[])
 		break;
 	}
 
-	for (int i = 2; i <= n; i++)
+	/*for (unsigned int i = 0; i < list.size(); i++)
 	{
-		list.push_back(i);
-	}
-	cout << list.size() << endl;
+	cout << list[i] << " ";
+	}*/
+	//cout << list.size() << endl;
 	system("pause");
 	return 0;
 
