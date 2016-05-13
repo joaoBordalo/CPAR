@@ -8,25 +8,25 @@ using namespace std;
 //list[1] == true =>   3 => unmarked (prime)
 //list[2] == false =>  4 => marked (not prime)
 
-vector <bool> markEven(vector <bool> primes)
+bool * markEven(bool * primes, const int primesSize)
 {
-	for (unsigned int i = 2; i < primes.size(); i = i + 2)
+	for (unsigned int i = 2; i < primesSize; i = i + 2)
 	{
 		primes[i] = false;
 	}
 	return primes;
 }
 
-vector <bool> sequencialPrime(vector <bool> primes)
+bool * sequencialPrime(bool * primes, const unsigned int primesSize)
 {
-	primes = markEven(primes);
+	primes = markEven(primes, primesSize);
 
-	for (unsigned int i = 1; (unsigned int)pow(i + 2, 2) <= primes.size(); i++)
+	for (unsigned int i = 1; (unsigned int)pow(i + 2, 2) <= primesSize; i++)
 	{
 		if (primes[i] != false)
 		{
 			unsigned int value = (unsigned int)pow(i + 2, 2);//(i+2) ^ 2
-			for (unsigned int j = value - 2; j < primes.size(); j = j + i + 2)
+			for (unsigned int j = value - 2; j < primesSize; j = j + i + 2)
 			{
 				primes[j] = false;
 			}
@@ -37,13 +37,13 @@ vector <bool> sequencialPrime(vector <bool> primes)
 	return primes;
 }
 
-vector <bool> initListPrime(int maxNumber)
+bool* initListPrime(const int maxNumber)
 {
-	vector<bool> list;
+	bool *list = (bool*)malloc(sizeof(bool)*(maxNumber - 1));
 
-	for (int i = 2; i <= maxNumber; i++)
+	for (int i = 0; i < maxNumber-1; i++)
 	{
-		list.push_back(true);
+		list[i] = true;
 	}
 	return list;
 }
@@ -70,12 +70,12 @@ int main(int args, char* argsv[])
 	cin >> n;
 	//} while (op != 0);
 
-	vector <bool> list = initListPrime(n);
+	bool *list = initListPrime(n);
 
 	switch (op)
 	{
 	case 1:
-		list = sequencialPrime(list);
+		list = sequencialPrime(list,n-1);
 		break;
 	case 2:
 		break;
@@ -85,10 +85,10 @@ int main(int args, char* argsv[])
 		break;
 	}
 
-	/*for (unsigned int i = 0; i < list.size(); i++)
+	for (unsigned int i = 0; i < n-1; i++)
 	{
 	cout << list[i] << " ";
-	}*/
+	}
 	//cout << list.size() << endl;
 	system("pause");
 	return 0;
