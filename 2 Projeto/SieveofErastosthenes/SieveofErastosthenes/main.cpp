@@ -1,4 +1,4 @@
-
+#include <omp.h>
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -15,7 +15,7 @@ using namespace std;
 //list[2] == false =>  4 => marked (not prime)
 
 
-
+//Sequencial algorithm
 bool * markEven(bool * primes, const ull primesSize)
 {
 	for (ull i = 2; i < primesSize; i = i + 2)
@@ -48,7 +48,56 @@ double sequencialPrime(bool * &primes, const ull primesSize)
 	//cout << "time: " << finalTime << endl;
 	return finalTime;
 }
+////////////////////////////////////////////////////////////////////////////
 
+
+// Parallel shared memory OpenMP algorithm
+
+double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize)
+{
+	double inicialTime, finalTime;
+	inicialTime = omp_get_wtime();
+
+
+
+	finalTime = omp_get_wtime() - inicialTime;
+	//cout << "time: " << finalTime << endl;
+	return finalTime;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+
+// Parallel distributed memory MPI algorithm
+
+double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize)
+{
+	double inicialTime, finalTime;
+	inicialTime = clock();
+
+
+
+	finalTime = (clock() - inicialTime) / CLOCKS_PER_SEC;
+	//cout << "time: " << finalTime << endl;
+	return finalTime;
+}
+///////////////////////////////////////////////////////////////////////////
+
+
+//  Parallel shared memory MPI algorithm
+
+double parallelSharedMemoryMPIPrime(bool * &primes, const ull primesSize)
+{
+	double inicialTime, finalTime;
+	inicialTime = clock();
+
+
+
+	finalTime = (clock() - inicialTime) / CLOCKS_PER_SEC;
+	//cout << "time: " << finalTime << endl;
+	return finalTime;
+}
+///////////////////////////////////////////////////////////////////////////
 bool* initListPrime(const ull maxNumber)
 {
 	bool *list = (bool*)malloc((maxNumber - 1)*sizeof(bool));
@@ -66,10 +115,9 @@ void outputFile(vector <double> timers, string fileName)
 	ofstream myfile;
 	fileName = fileName + ".csv";
 	myfile.open(fileName);
-	myfile << "Prime Value; Time" << endl;
-	unsigned int i = 0;
-	unsigned int j = MINIMUM_VALUE;
-	for (; i < timers.size(); i++, j++)
+	myfile << "Prime Value; Time (secs)" << endl;
+	
+	for (unsigned int i = 0,  j = MINIMUM_VALUE; i < timers.size(); i++, j++)
 	{
 		myfile <<"2^"<< j << ";" << timers[i] << endl;
 	}
@@ -104,7 +152,6 @@ int main(int args, char* argsv[])
 		switch (op)
 		{
 		case 1:
-		{
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -112,7 +159,7 @@ int main(int args, char* argsv[])
 				double time = sequencialPrime(list, n - 1);
 				/*for (unsigned long i = 0; i < n - 1; i++)
 				{
-					cout << list[i] << " ";
+				cout << list[i] << " ";
 				}*/
 				timers.push_back(time);
 				cout << "Sequencial time: " << time << endl;
@@ -120,17 +167,57 @@ int main(int args, char* argsv[])
 			}
 			outputFile(timers, "SequencialPrime");
 			break;
-		}
 		case 2:
+			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
+			{
+				n = (ull)pow(2, i);
+				list = initListPrime(n);
+				double time = parallelSharedMemoryOpenMPPrime(list, n - 1);
+				/*for (unsigned long i = 0; i < n - 1; i++)
+				{
+				cout << list[i] << " ";
+				}*/
+				timers.push_back(time);
+				cout << "Parallel shared memory OpenMP time: " << time << endl;
+				free(list);
+			}
+			outputFile(timers, "ParallelSharedMemoryOpenMP");
 			break;
 		case 3:
+			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
+			{
+				n = (ull)pow(2, i);
+				list = initListPrime(n);
+				double time = parallelDistributedMemoryMPIPrime(list, n - 1);
+				/*for (unsigned long i = 0; i < n - 1; i++)
+				{
+				cout << list[i] << " ";
+				}*/
+				timers.push_back(time);
+				cout << "Parallel distributed memory MPI time: " << time << endl;
+				free(list);
+			}
+			outputFile(timers, "ParallelDistributedMemoryMPI");
 			break;
 		case 4:
+			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
+			{
+				n = (ull)pow(2, i);
+				list = initListPrime(n);
+				double time = parallelSharedMemoryMPIPrime(list, n - 1);
+				/*for (unsigned long i = 0; i < n - 1; i++)
+				{
+				cout << list[i] << " ";
+				}*/
+				timers.push_back(time);
+				cout << "Parallel shared memory MPI time: " << time << endl;
+				free(list);
+			}
+			outputFile(timers, "ParallelSharedMemoryMPI");
 			break;
 		default:
 			break;
 		}
-
 	} while (op != 0);
 
 	/*for (unsigned int i = 0; i < n - 1; i++)
@@ -138,7 +225,7 @@ int main(int args, char* argsv[])
 		cout << list[i] << " ";
 	}*/
 	//cout << list.size() << endl;
-	system("pause");
+	//system("pause");
 	return 0;
 
 }
