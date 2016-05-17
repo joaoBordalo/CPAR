@@ -7,7 +7,7 @@
 #include <fstream>
 
 #define MINIMUM_VALUE 25 // 2^25
-#define MAXIMUM_VALUE 30 // 2^30 NOTE: in my pc can't beyond 30
+#define MAXIMUM_VALUE 32 // 2^30 NOTE: in my pc can't beyond 30
 typedef unsigned long long ull;
 using namespace std;
 //list[0] == true =>   2 => unmarked (prime)
@@ -128,7 +128,7 @@ void outputFile(const vector <double> timers, string fileName, const unsigned in
 {
 	ofstream myfile;
 	fileName = fileName + ".csv";
-	myfile.open(fileName);
+	myfile.open(fileName.c_str());
 	myfile << "Prime Value; Time (secs)" << endl;
 	
 	for (unsigned int i = 0,  j = MINIMUM_VALUE; i < timers.size(); i++, j++)
@@ -170,6 +170,7 @@ int main(int args, char* argsv[])
 		switch (op)
 		{
 		case 1:
+		{
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -184,6 +185,8 @@ int main(int args, char* argsv[])
 				free(list);
 			}
 			outputFile(timers, "SequencialPrime", 0);
+			timers.clear();
+		}
 			break;
 		case 2:
 		{
@@ -208,9 +211,11 @@ int main(int args, char* argsv[])
 				free(list);
 			}
 			outputFile(timers, "ParallelSharedMemoryOpenMP", nThreads);
+			timers.clear();
 		}
 			break;
 		case 3:
+		{
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -225,8 +230,11 @@ int main(int args, char* argsv[])
 				free(list);
 			}
 			outputFile(timers, "ParallelDistributedMemoryMPI",0);
+			timers.clear();
+		}
 			break;
 		case 4:
+		{
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -241,6 +249,8 @@ int main(int args, char* argsv[])
 				free(list);
 			}
 			outputFile(timers, "ParallelSharedMemoryMPI",0);
+			timers.clear();
+		}
 			break;
 		default:
 			break;
