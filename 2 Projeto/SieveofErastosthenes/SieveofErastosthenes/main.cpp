@@ -51,14 +51,28 @@ double sequencialPrime(bool * &primes, const ull primesSize)
 ////////////////////////////////////////////////////////////////////////////
 
 
-// Parallel shared memory OpenMP algorithm
+// Parallel shared memory OpenMP algorithm 
 
-double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize)
+double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize, unsigned int nThreads)
 {
 	double inicialTime, finalTime;
+
+	omp_set_num_threads(nThreads);
+
 	inicialTime = omp_get_wtime();
 
+	for (ull i = 0; (ull)pow(i + 2, 2) <= primesSize; i++)
+	{
+		if (primes[i] != false)
+		{
+			#pragma omp parallel for
+			for (ull j = (ull)pow(i + 2, 2) - 2; j < primesSize; j = j + i + 2)
+			{
+				primes[j] = false;
+			}
+		}
 
+	}
 
 	finalTime = omp_get_wtime() - inicialTime;
 	//cout << "time: " << finalTime << endl;
@@ -110,7 +124,7 @@ bool* initListPrime(const ull maxNumber)
 	return list;
 }
 
-void outputFile(vector <double> timers, string fileName)
+void outputFile(const vector <double> timers, string fileName, const unsigned int nThreads)
 {
 	ofstream myfile;
 	fileName = fileName + ".csv";
@@ -120,6 +134,10 @@ void outputFile(vector <double> timers, string fileName)
 	for (unsigned int i = 0,  j = MINIMUM_VALUE; i < timers.size(); i++, j++)
 	{
 		myfile <<"2^"<< j << ";" << timers[i] << endl;
+	}
+	if (nThreads != 0)
+	{
+		myfile << "Number Threads: ;" << nThreads;
 	}
 	myfile.close();
 }
@@ -165,14 +183,22 @@ int main(int args, char* argsv[])
 				cout << "Sequencial time: " << time << endl;
 				free(list);
 			}
-			outputFile(timers, "SequencialPrime");
+			outputFile(timers, "SequencialPrime", 0);
 			break;
 		case 2:
+		{
+			unsigned int nThreads;
+			cout << "Number of Threads:";
+			cin >> nThreads;
+
+			if (omp_get_max_threads() < (int) nThreads)
+				nThreads =  omp_get_max_threads();
+
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
 				list = initListPrime(n);
-				double time = parallelSharedMemoryOpenMPPrime(list, n - 1);
+				double time = parallelSharedMemoryOpenMPPrime(list, n - 1, nThreads);
 				/*for (unsigned long i = 0; i < n - 1; i++)
 				{
 				cout << list[i] << " ";
@@ -181,7 +207,8 @@ int main(int args, char* argsv[])
 				cout << "Parallel shared memory OpenMP time: " << time << endl;
 				free(list);
 			}
-			outputFile(timers, "ParallelSharedMemoryOpenMP");
+			outputFile(timers, "ParallelSharedMemoryOpenMP", nThreads);
+		}
 			break;
 		case 3:
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
@@ -197,7 +224,7 @@ int main(int args, char* argsv[])
 				cout << "Parallel distributed memory MPI time: " << time << endl;
 				free(list);
 			}
-			outputFile(timers, "ParallelDistributedMemoryMPI");
+			outputFile(timers, "ParallelDistributedMemoryMPI",0);
 			break;
 		case 4:
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
@@ -213,7 +240,7 @@ int main(int args, char* argsv[])
 				cout << "Parallel shared memory MPI time: " << time << endl;
 				free(list);
 			}
-			outputFile(timers, "ParallelSharedMemoryMPI");
+			outputFile(timers, "ParallelSharedMemoryMPI",0);
 			break;
 		default:
 			break;
