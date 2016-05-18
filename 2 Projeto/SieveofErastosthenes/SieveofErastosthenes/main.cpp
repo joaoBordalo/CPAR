@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <fstream>
+//#include <mpi.h>
 
 #define MINIMUM_VALUE 25 // 2^25
 #define MAXIMUM_VALUE 32 // 2^30 NOTE: in my pc can't beyond 30
@@ -12,9 +13,9 @@
 //Block Decomposition Macros
 
 #define BLOCK_LOW(i,p,n) ((i)*(n)/(p))
-#define BLOCK_HIGH(i,p,n) \ (BLOCK_LOW((i)+1,p,n)-1)
-#define BLOCK_SIZE(i,p,n) \ (BLOCK_LOW((i)+1,p,n)-BLOCK_LOW(i,p,n)
-#define BLOCK_OWNER(index,p,n) \ ((((p)*(index)+1)-1)/(n))
+#define BLOCK_HIGH(i,p,n) (BLOCK_LOW((i)+1,p,n)-1)
+#define BLOCK_SIZE(i,p,n) (BLOCK_LOW((i)+1,p,n)-BLOCK_LOW(i,p,n)
+#define BLOCK_OWNER(index,p,n) ((((p)*(index)+1)-1)/(n))
 
 typedef unsigned long long ull;
 using namespace std;
@@ -92,10 +93,17 @@ double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize, uns
 
 // Parallel distributed memory MPI algorithm
 
-double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize)
+double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize, int size, int rank)
 {
+	ull blockSize = BLOCK_SIZE(rank, size, primesSize-1);
+	ull lowValue = BLOCK_LOW(rank,size,primesSize -1) + 2;
+	ull highValue = BLOCK_HIGH(rank,size,primesSize-1) + 2;
+	ull startBlockValue;
 	double inicialTime, finalTime;
-	inicialTime = MPI_Wtime();
+	if(rank == 0)
+	{
+		inicialTime = MPI_Wtime();
+	}
 
 
 
@@ -111,11 +119,11 @@ double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize)
 double parallelSharedMemoryMPIPrime(bool * &primes, const ull primesSize)
 {
 	double inicialTime, finalTime;
-	inicialTime = MPI_Wtime();
+	//inicialTime = MPI_Wtime();
 
 
 
-	finalTime = MPI_Wtime() - inicialTime;
+	//finalTime = MPI_Wtime() - inicialTime;
 	//cout << "time: " << finalTime << endl;
 	return finalTime;
 }
@@ -163,6 +171,7 @@ void finalizeMPI()
 {
 	MPI_Finalize();
 }
+
 int main(int args, char* argsv[])
 {
 	//int n = atoi(argsv[1]);
@@ -242,7 +251,7 @@ int main(int args, char* argsv[])
 			{
 				n = (ull)pow(2, i);
 				list = initListPrime(n);
-				double time = parallelDistributedMemoryMPIPrime(list, n - 1);
+				double time = parallelDistributedMemoryMPIPrime(list, n - 1, size, rank);
 				/*for (unsigned long i = 0; i < n - 1; i++)
 				{
 				cout << list[i] << " ";
@@ -258,12 +267,12 @@ int main(int args, char* argsv[])
 			break;
 		case 4:
 		{
-			initMPI(argc,argv,size,rank);
+			//initMPI(argc,argv,size,rank);
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
 				list = initListPrime(n);
-				double time = parallelSharedMemoryMPIPrime(list, n - 1);
+				double time = parallelSharedMemoryMPIPrime(list, n - 1, size, rank);
 				/*for (unsigned long i = 0; i < n - 1; i++)
 				{
 				cout << list[i] << " ";
@@ -272,7 +281,7 @@ int main(int args, char* argsv[])
 				cout << "Parallel shared memory MPI time: " << time << endl;
 				free(list);
 			}
-			finalizeMPI();
+			//finalizeMPI();
 			outputFile(timers, "ParallelSharedMemoryMPI",0);
 			timers.clear();
 		}
