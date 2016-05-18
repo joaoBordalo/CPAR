@@ -8,6 +8,14 @@
 
 #define MINIMUM_VALUE 25 // 2^25
 #define MAXIMUM_VALUE 32 // 2^30 NOTE: in my pc can't beyond 30
+
+//Block Decomposition Macros
+
+#define BLOCK_LOW(i,p,n) ((i)*(n)/(p))
+#define BLOCK_HIGH(i,p,n) \ (BLOCK_LOW((i)+1,p,n)-1)
+#define BLOCK_SIZE(i,p,n) \ (BLOCK_LOW((i)+1,p,n)-BLOCK_LOW(i,p,n)
+#define BLOCK_OWNER(index,p,n) \ ((((p)*(index)+1)-1)/(n))
+
 typedef unsigned long long ull;
 using namespace std;
 //list[0] == true =>   2 => unmarked (prime)
@@ -15,7 +23,7 @@ using namespace std;
 //list[2] == false =>  4 => marked (not prime)
 
 
-//Sequencial algorithm
+//Sequencial algorithm (DONE)
 bool * markEven(bool * primes, const ull primesSize)
 {
 	for (ull i = 2; i < primesSize; i = i + 2)
@@ -51,7 +59,7 @@ double sequencialPrime(bool * &primes, const ull primesSize)
 ////////////////////////////////////////////////////////////////////////////
 
 
-// Parallel shared memory OpenMP algorithm 
+// Parallel shared memory OpenMP algorithm (DONE)
 
 double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize, unsigned int nThreads)
 {
@@ -87,11 +95,11 @@ double parallelSharedMemoryOpenMPPrime(bool * &primes, const ull primesSize, uns
 double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize)
 {
 	double inicialTime, finalTime;
-	inicialTime = clock();
+	inicialTime = MPI_Wtime();
 
 
 
-	finalTime = (clock() - inicialTime) / CLOCKS_PER_SEC;
+	finalTime = MPI_Wtime() - inicialTime;
 	//cout << "time: " << finalTime << endl;
 	return finalTime;
 }
@@ -103,11 +111,11 @@ double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize)
 double parallelSharedMemoryMPIPrime(bool * &primes, const ull primesSize)
 {
 	double inicialTime, finalTime;
-	inicialTime = clock();
+	inicialTime = MPI_Wtime();
 
 
 
-	finalTime = (clock() - inicialTime) / CLOCKS_PER_SEC;
+	finalTime = MPI_Wtime() - inicialTime;
 	//cout << "time: " << finalTime << endl;
 	return finalTime;
 }
@@ -142,11 +150,24 @@ void outputFile(const vector <double> timers, string fileName, const unsigned in
 	myfile.close();
 }
 
+
+void initMPI(int &argc, char** &argv, int &size, int &rank)
+{
+	MPI_Init(&argc,&argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Barrier(MPI_COMM_WORLD);
+}
+
+void finalizeMPI()
+{
+	MPI_Finalize();
+}
 int main(int args, char* argsv[])
 {
 	//int n = atoi(argsv[1]);
 	ull n;
-	int op = 1;
+	int op = 1, size, rank;
 	bool *list;
 	vector <double> timers;
 
@@ -216,6 +237,7 @@ int main(int args, char* argsv[])
 			break;
 		case 3:
 		{
+			initMPI(argc,argv,size,rank);
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -229,12 +251,14 @@ int main(int args, char* argsv[])
 				cout << "Parallel distributed memory MPI time: " << time << endl;
 				free(list);
 			}
+			finalizeMPI();
 			outputFile(timers, "ParallelDistributedMemoryMPI",0);
 			timers.clear();
 		}
 			break;
 		case 4:
 		{
+			initMPI(argc,argv,size,rank);
 			for (ull i = MINIMUM_VALUE; i <= MAXIMUM_VALUE; i++)
 			{
 				n = (ull)pow(2, i);
@@ -248,6 +272,7 @@ int main(int args, char* argsv[])
 				cout << "Parallel shared memory MPI time: " << time << endl;
 				free(list);
 			}
+			finalizeMPI();
 			outputFile(timers, "ParallelSharedMemoryMPI",0);
 			timers.clear();
 		}
