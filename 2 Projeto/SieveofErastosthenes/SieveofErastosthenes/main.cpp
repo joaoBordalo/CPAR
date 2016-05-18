@@ -51,7 +51,6 @@ double sequencialPrime(bool * &primes, const ull primesSize)
 				primes[j] = false;
 			}
 		}
-
 	}
 	finalTime = (clock() - inicialTime) / CLOCKS_PER_SEC;
 	//cout << "time: " << finalTime << endl;
@@ -100,11 +99,36 @@ double parallelDistributedMemoryMPIPrime(bool * &primes, const ull primesSize, i
 	ull highValue = BLOCK_HIGH(rank,size,primesSize-1) + 2;
 	ull startBlockValue;
 	double inicialTime, finalTime;
+	
 	if(rank == 0)
 	{
 		inicialTime = MPI_Wtime();
 	}
 
+
+	for (ull i = 1; (ull)pow(i + 2, 2) <= primesSize; i++)
+	{
+		if (pow(i+2,2) < lowValue)
+		{
+			if(lowValue % (i+2) == 0)
+			{
+				startBlock = lowValue;
+			}
+			else
+			{
+				startBlockValue = lowValue + ((i+2) - (lowValue % (i+2));
+			}
+		}
+		
+		if (primes[i] != false)
+		{
+			ull value = (ull)pow(i + 2, 2);//(i+2) ^ 2
+			for (ull j = value - 2; j < primesSize; j = j + i + 2)
+			{
+				primes[j] = false;
+			}
+		}
+	}
 
 
 	finalTime = MPI_Wtime() - inicialTime;
