@@ -7,4 +7,4 @@
 (for point 3)
 >mpic++ mpi.cpp -o mpi -fopenmp -O2 -Wall
 
->./mpi
+>mpirun -np 4 ./mpi
