@@ -24,6 +24,13 @@ Setup PAPI
 - Compile matrixProd.cpp
   - g++ -o nomeDoExecutável -fopenmp "source.cpp" -lpapi 
   - run ./nomeDoExecutével.out and introduce the matrix size values
+  - 
+  
+
+
+##Second Assignement
+[report](https://docs.google.com/document/d/1mpD8Bad25-M6sD95UlRMCny1HualumaRGz6jqOZozf0/edit?usp=sharing)
+[Excel](https://docs.google.com/spreadsheets/d/1hoNfAlLS5GzrGr8CCGs-AbnpWWV2t9PvaWTrt6fIEwo/edit?usp=sharing)
 
   Developers
   João Bordalo
